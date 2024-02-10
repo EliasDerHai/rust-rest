@@ -1,10 +1,10 @@
 use rocket::http::{ContentType, Status};
 use rocket::local::blocking::Client;
 use rocket::serde::json::json;
-use rust_rest::{
-    get_server, API_DESCRIPTION_PATH, API_DESCRIPTION_RESPONSE, HELLO_PATH, HELLO_RESPONSE,
-    THRUSTER_PATH,
-}; // Adjust the import path as needed
+use rust_rest::endpoints::description::{API_DESCRIPTION_PATH, API_DESCRIPTION_RESPONSE};
+use rust_rest::endpoints::hello::{HELLO_PATH, HELLO_RESPONSE};
+use rust_rest::endpoints::thruster::THRUSTER_PATH;
+use rust_rest::get_server;
 
 #[test]
 fn test_get_endpoints() {
