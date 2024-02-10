@@ -1,0 +1,2 @@
+[default.databases.rocket_database]
+url = "sqlite:./rocket_database.sqlite"
