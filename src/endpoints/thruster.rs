@@ -23,9 +23,4 @@ pub async fn post_thruster_endpoint(
             )),
             Err(e) => Err(format!("Failed to insert thruster data: {}", e)),
         }
-
-    // format!(
-    //     "Received: Thurster named '{}' with a consumption of {} liter per second on idle engine",
-    //     data.name, data.consumption_in_liter_per_second
-    // )
 }
