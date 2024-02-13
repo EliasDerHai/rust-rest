@@ -1,3 +1,4 @@
+use dotenvy::dotenv;
 use rocket::http::{ContentType, Status};
 use rocket::local::blocking::Client;
 use rocket::serde::json::json;
@@ -5,9 +6,16 @@ use rust_rest::endpoints::description::{API_DESCRIPTION_PATH, API_DESCRIPTION_RE
 use rust_rest::endpoints::hello::{HELLO_PATH, HELLO_RESPONSE};
 use rust_rest::endpoints::thruster::THRUSTER_PATH;
 use rust_rest::get_server;
+use std::path::Path;
+
+fn setup() {
+    let dotenv_path = Path::new(".test.env");
+    dotenvy::from_path(dotenv_path).ok();
+}
 
 #[test]
 fn test_get_endpoints() {
+    setup();
     let client = Client::tracked(get_server()).expect("valid rocket instance");
 
     let get_endpoint_expectations: Vec<(&str, &str)> = vec![
@@ -24,6 +32,7 @@ fn test_get_endpoints() {
 
 #[test]
 fn test_post_thruster_endpoint() {
+    setup();
     let client = Client::tracked(get_server()).expect("valid rocket instance");
     let data = json!({
         "name": "Cold gas thruster",
@@ -39,6 +48,6 @@ fn test_post_thruster_endpoint() {
     assert_eq!(response.status(), Status::Ok);
     assert_eq!(
         response.into_string().unwrap(),
-        "Received: Thurster named 'Cold gas thruster' with a consumption of 12.5 liter per second on idle engine"
+        "Thurster named 'Cold gas thruster' successfully saved"
     );
 }

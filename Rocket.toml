@@ -1,2 +1,4 @@
 [default.databases.rocket_database]
-url = "sqlite:./rocket_database.sqlite"
+url = "${DATABASE_URL}"
+
+#url = "sqlite:./rocket_database.sqlite"

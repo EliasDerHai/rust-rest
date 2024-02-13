@@ -1434,6 +1434,7 @@ dependencies = [
 name = "rust-rest"
 version = "0.1.0"
 dependencies = [
+ "dotenvy",
  "rocket",
  "rocket_db_pools",
  "serde",
