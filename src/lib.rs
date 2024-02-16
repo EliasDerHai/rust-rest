@@ -7,6 +7,10 @@ use crate::database::custom_pool::CustomDbPool;
 pub mod database;
 pub mod endpoints;
 
+pub trait CustomizedRocket {
+    fn take_off(self) -> Rocket<Build>;
+}
+
 
 pub async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
     // Assuming `CustomDbPool` is compatible with `fetch` to get the pool.
@@ -20,13 +24,15 @@ pub async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
     Ok(rocket)
 }
 
-pub fn migrate_db_and_add_routes(rocket: Rocket<Build>) -> Rocket<Build>{
-    rocket
-        .attach(CustomDbPool::init())
-        .attach(AdHoc::try_on_ignite("Run Migrations", run_migrations))
-        .mount("/", routes![
+impl CustomizedRocket for Rocket<Build> {
+    fn take_off(self) -> Rocket<Build> {
+        self
+            .attach(CustomDbPool::init())
+            .attach(AdHoc::try_on_ignite("Run Migrations", run_migrations))
+            .mount("/", routes![
             endpoints::hello::get_hello_endpoint,
             endpoints::description::get_api_description_endpoint,
             endpoints::thruster::post_thruster_endpoint,
         ])
+    }
 }

@@ -4,13 +4,13 @@ use rocket::serde::json::json;
 use rust_rest::endpoints::description::{API_DESCRIPTION_PATH, API_DESCRIPTION_RESPONSE};
 use rust_rest::endpoints::hello::{HELLO_PATH, HELLO_RESPONSE};
 use rust_rest::endpoints::thruster::THRUSTER_PATH;
-use rust_rest::migrate_db_and_add_routes;
+use rust_rest::CustomizedRocket;
 
 async fn launch_test_instance() -> Client {
     let database_url = "sqlite:./rocket_database_test.sqlite";
     let rocket = rocket::custom(rocket::Config::figment()
         .merge(("databases.rocket_database.url", database_url)));
-    Client::tracked(migrate_db_and_add_routes(rocket)).await.expect("valid rocket instance")
+    Client::tracked(rocket.take_off()).await.expect("valid rocket instance")
 }
 
 #[rocket::async_test]
