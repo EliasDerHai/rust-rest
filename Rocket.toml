@@ -1,6 +1,5 @@
+[global.databases.rocket_database]
+url = "sqlite:./rocket_database.sqlite"
+
 [debug]
 port = 8080
-
-
-[development]
-databases.rocket_database.url = "sqlite:./rocket_database.sqlite"

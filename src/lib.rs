@@ -1,33 +1,46 @@
 use rocket::{error, routes};
-use rocket::{Rocket, Build, fairing::{self, AdHoc}};
+use rocket::{Build, fairing::{self, AdHoc}, Rocket};
+use rocket_db_pools::Database;
+
 use crate::database::custom_pool::CustomDbPool;
-use rocket_db_pools::{Database, Config as DbConfig};
 
 pub mod database;
 pub mod endpoints;
 
-async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
-    match CustomDbPool::fetch(&rocket) {
-        Some(db) => match sqlx::migrate!().run(&**db).await {
-            Ok(_) => Ok(rocket),
-            Err(e) => {
-                error!("Failed to run database migrations: {}", e);
-                Err(rocket)
-            }
-        },
-        None => Err(rocket),
+
+pub async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
+    // Assuming `CustomDbPool` is compatible with `fetch` to get the pool.
+    if let Some(db) = CustomDbPool::fetch(&rocket) {
+        if let Err(e) = sqlx::migrate!().run(&**db).await {
+            error!("Failed to run database migrations: {}", e);
+            return Err(rocket);
+        }
     }
+
+    Ok(rocket)
 }
 
-pub fn get_server() -> rocket::Rocket<rocket::Build> {
-    let routes = routes![
-        endpoints::hello::get_hello_endpoint,
-        endpoints::description::get_api_description_endpoint,
-        endpoints::thruster::post_thruster_endpoint,
-    ];
-
+pub fn rocket() -> Rocket<Build> {
     rocket::build()
         .attach(CustomDbPool::init())
         .attach(AdHoc::try_on_ignite("Run Migrations", run_migrations))
-        .mount("/", routes)
+        .mount("/", routes![
+            endpoints::hello::get_hello_endpoint,
+            endpoints::description::get_api_description_endpoint,
+            endpoints::thruster::post_thruster_endpoint,
+        ])
+}
+
+pub fn rocket_with_custom_db(database_url: &str) -> Rocket<Build> {
+    let figment = rocket::Config::figment()
+        .merge(("databases.rocket_database.url", database_url));
+
+    rocket::custom(figment)
+        .attach(CustomDbPool::init())
+        .attach(AdHoc::try_on_ignite("Run Migrations", run_migrations))
+        .mount("/", routes![
+            endpoints::hello::get_hello_endpoint,
+            endpoints::description::get_api_description_endpoint,
+            endpoints::thruster::post_thruster_endpoint,
+        ])
 }

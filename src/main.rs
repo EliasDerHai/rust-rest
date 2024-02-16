@@ -1,9 +1,9 @@
 #[macro_use]
 extern crate rocket;
 
-use rust_rest::get_server;
+use rust_rest::{rocket};
 
 #[launch]
 fn boot() -> _ {
-    get_server()
+    rocket()
 }
