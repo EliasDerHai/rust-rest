@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO rocket_thruster (name, manufacturer, min_consumption_in_liter_per_second, max_consumption_in_liter_per_second, fuel_type) VALUES (?, ?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "0bcec47cf8302dd274d226e5463b2901a9d0382f33d728cba3cea76eff4d5dff"
+}

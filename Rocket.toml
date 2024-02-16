@@ -1,4 +1,6 @@
-[default.databases.rocket_database]
-url = "${DATABASE_URL}"
+[debug]
+port = 8080
 
-#url = "sqlite:./rocket_database.sqlite"
+
+[development]
+databases.rocket_database.url = "sqlite:./rocket_database.sqlite"
