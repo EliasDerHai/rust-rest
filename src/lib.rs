@@ -32,6 +32,7 @@ impl CustomizedRocket for Rocket<Build> {
             endpoints::hello::get_hello_endpoint,
             endpoints::description::get_api_description_endpoint,
             endpoints::thruster::post_thruster_endpoint,
+            endpoints::thruster::get_thrusters_endpoint,
         ])
     }
 }

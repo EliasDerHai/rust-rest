@@ -1,0 +1,50 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM rocket_thruster",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      },
+      {
+        "name": "name",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "manufacturer",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "min_consumption_in_liter_per_second",
+        "ordinal": 3,
+        "type_info": "Float"
+      },
+      {
+        "name": "max_consumption_in_liter_per_second",
+        "ordinal": 4,
+        "type_info": "Float"
+      },
+      {
+        "name": "fuel_type",
+        "ordinal": 5,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "0a2318433a23ac222475fc4e254149960a8a5b8319719d4f7273903adbc46336"
+}

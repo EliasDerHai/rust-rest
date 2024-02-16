@@ -1,10 +1,11 @@
-use rocket::local::asynchronous::Client;
 use rocket::http::{ContentType, Status};
-use rocket::serde::json::json;
+use rocket::local::asynchronous::Client;
+use rocket::serde::json::serde_json;
+
+use rust_rest::CustomizedRocket;
 use rust_rest::endpoints::description::{API_DESCRIPTION_PATH, API_DESCRIPTION_RESPONSE};
 use rust_rest::endpoints::hello::{HELLO_PATH, HELLO_RESPONSE};
-use rust_rest::endpoints::thruster::THRUSTER_PATH;
-use rust_rest::CustomizedRocket;
+use rust_rest::endpoints::thruster::{RocketThruster, RocketThrusterEntity, THRUSTER_PATH};
 
 async fn launch_test_instance() -> Client {
     let database_url = "sqlite:./rocket_database_test.sqlite";
@@ -14,7 +15,7 @@ async fn launch_test_instance() -> Client {
 }
 
 #[rocket::async_test]
-async fn test_get_endpoints() {
+async fn test_string_endpoints() {
     let client = launch_test_instance().await;
 
     let get_endpoint_expectations: Vec<(&str, &str)> = vec![
@@ -29,21 +30,38 @@ async fn test_get_endpoints() {
     }
 }
 
+// thruster
+
+fn get_test_thruster() -> RocketThruster {
+    RocketThruster {
+        name: "Cold gas thruster".to_string(),
+        manufacturer: "Test Manufacturer".to_string(),
+        min_consumption_in_liter_per_second: 12.5,
+        max_consumption_in_liter_per_second: 15.0,
+        fuel_type: "Test Fuel".to_string(),
+    }
+}
+
 #[rocket::async_test]
 async fn test_post_thruster_endpoint() {
     let client = launch_test_instance().await;
-    let data = json!({
-            "name": "Cold gas thruster",
-            "manufacturer": "Test Manufacturer",
-            "min_consumption_in_liter_per_second": 12.5,
-            "max_consumption_in_liter_per_second": 15.0,
-            "fuel_type": "Test Fuel"
-        });
+    let test_thruster = get_test_thruster();
+    let serialized_thruster = serde_json::to_string(&test_thruster).expect("Failed to serialize thruster");
 
     let response = client.post(THRUSTER_PATH)
         .header(ContentType::JSON)
-        .body(data.to_string())
+        .body(serialized_thruster)
         .dispatch().await;
 
+    // Ensure the status is OK
     assert_eq!(response.status(), Status::Ok);
+
+    let actual: RocketThrusterEntity = response.into_json().await.expect("valid JSON response");
+
+    assert!(actual.id > 0, "Expected a valid ID greater than 0");
+    assert_eq!(actual.name, test_thruster.name);
+    assert_eq!(actual.manufacturer, test_thruster.manufacturer);
+    assert_eq!(actual.min_consumption_in_liter_per_second, test_thruster.min_consumption_in_liter_per_second);
+    assert_eq!(actual.max_consumption_in_liter_per_second, test_thruster.max_consumption_in_liter_per_second);
+    assert_eq!(actual.fuel_type, test_thruster.fuel_type);
 }
