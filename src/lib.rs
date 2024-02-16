@@ -13,7 +13,6 @@ pub trait CustomizedRocket {
 
 
 pub async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
-    // Assuming `CustomDbPool` is compatible with `fetch` to get the pool.
     if let Some(db) = CustomDbPool::fetch(&rocket) {
         if let Err(e) = sqlx::migrate!().run(&**db).await {
             error!("Failed to run database migrations: {}", e);
