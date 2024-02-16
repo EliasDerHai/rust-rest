@@ -20,22 +20,8 @@ pub async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
     Ok(rocket)
 }
 
-pub fn rocket() -> Rocket<Build> {
-    rocket::build()
-        .attach(CustomDbPool::init())
-        .attach(AdHoc::try_on_ignite("Run Migrations", run_migrations))
-        .mount("/", routes![
-            endpoints::hello::get_hello_endpoint,
-            endpoints::description::get_api_description_endpoint,
-            endpoints::thruster::post_thruster_endpoint,
-        ])
-}
-
-pub fn rocket_with_custom_db(database_url: &str) -> Rocket<Build> {
-    let figment = rocket::Config::figment()
-        .merge(("databases.rocket_database.url", database_url));
-
-    rocket::custom(figment)
+pub fn migrate_db_and_add_routes(rocket: Rocket<Build>) -> Rocket<Build>{
+    rocket
         .attach(CustomDbPool::init())
         .attach(AdHoc::try_on_ignite("Run Migrations", run_migrations))
         .mount("/", routes![
