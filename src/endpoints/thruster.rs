@@ -4,7 +4,7 @@ use rocket::serde::{Deserialize, Serialize};
 use crate::database::{custom_pool::CustomDbPool, thruster::insert_rocket_thruster};
 use crate::database::thruster::get_rocket_thrusters;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 #[serde(crate = "rocket::serde")]
 pub struct RocketThrusterEntity {
     pub id: i64,
@@ -15,7 +15,7 @@ pub struct RocketThrusterEntity {
     pub fuel_type: String
 }
 
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 #[serde(crate = "rocket::serde")]
 pub struct RocketThruster {
     pub name: String,
@@ -23,6 +23,26 @@ pub struct RocketThruster {
     pub min_consumption_in_liter_per_second: f64,
     pub max_consumption_in_liter_per_second: f64,
     pub fuel_type: String,
+}
+
+impl PartialEq for RocketThrusterEntity {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name &&
+            self.manufacturer == other.manufacturer &&
+            (self.min_consumption_in_liter_per_second - other.min_consumption_in_liter_per_second).abs() < f64::EPSILON &&
+            (self.max_consumption_in_liter_per_second - other.max_consumption_in_liter_per_second).abs() < f64::EPSILON &&
+            self.fuel_type == other.fuel_type
+    }
+}
+
+impl PartialEq for RocketThruster {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name &&
+            self.manufacturer == other.manufacturer &&
+            (self.min_consumption_in_liter_per_second - other.min_consumption_in_liter_per_second).abs() < f64::EPSILON &&
+            (self.max_consumption_in_liter_per_second - other.max_consumption_in_liter_per_second).abs() < f64::EPSILON &&
+            self.fuel_type == other.fuel_type
+    }
 }
 
 pub const THRUSTER_PATH: &str = "/thruster";
