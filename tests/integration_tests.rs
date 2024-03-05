@@ -1,6 +1,7 @@
 use rocket::http::{ContentType, Status};
 use rocket::local::asynchronous::Client;
 use rocket::serde::json::serde_json;
+use uuid::Uuid;
 
 use rust_rest::CustomizedRocket;
 use rust_rest::endpoints::description::{API_DESCRIPTION_PATH, API_DESCRIPTION_RESPONSE};
@@ -8,14 +9,14 @@ use rust_rest::endpoints::hello::{HELLO_PATH, HELLO_RESPONSE};
 use rust_rest::endpoints::thruster::{RocketThruster, RocketThrusterEntity, THRUSTER_PATH, THRUSTERS_PATH};
 
 async fn launch_test_instance() -> Client {
-    let database_url = "sqlite:./rocket_database_test.sqlite";
+    let database_url = format!("sqlite:./rocket_database_test{}.sqlite", Uuid::new_v4());
     let rocket = rocket::custom(rocket::Config::figment()
         .merge(("databases.rocket_database.url", database_url)));
     Client::tracked(rocket.take_off()).await.expect("valid rocket instance")
 }
 
 #[rocket::async_test]
-async fn test_string_endpoints() {
+async fn string_endpoints() {
     let client = launch_test_instance().await;
 
     let get_endpoint_expectations: Vec<(&str, &str)> = vec![
@@ -46,7 +47,7 @@ fn get_test_thruster() -> RocketThruster {
 }
 
 #[rocket::async_test]
-async fn test_post_thruster_endpoint() {
+async fn post_thruster_endpoint() {
     let client = launch_test_instance().await;
     let test_thruster = get_test_thruster();
     let serialized_thruster = serde_json::to_string(&test_thruster).expect("Failed to serialize thruster");
@@ -70,7 +71,7 @@ async fn test_post_thruster_endpoint() {
 }
 
 #[rocket::async_test]
-async fn test_get_thrusters_endpoint() {
+async fn get_thrusters_endpoint() {
     let client = launch_test_instance().await;
     let test_thruster = get_test_thruster();
     let serialized_thruster = serde_json::to_string(&test_thruster).expect("Failed to serialize thruster");
